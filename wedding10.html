@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Wedding of Malik & Annisa - Batik Edition</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- AOS Animation -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Pinyon+Script&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: {
+                            50: '#FDFBF7',
+                            100: '#F7F1E3',
+                            200: '#EFE6D5',
+                            300: '#E6DCC5',
+                            900: '#8C7E6A'
+                        },
+                        batik: {
+                            light: '#D2B48C',
+                            DEFAULT: '#A0522D', // Sienna
+                            dark: '#5D4037', // Dark Brown
+                            accent: '#C5A059' // Muted Gold
+                        }
+                    },
+                    fontFamily: {
+                        'script': ['"Pinyon Script"', 'cursive'],
+                        'serif': ['"Cormorant Garamond"', 'serif'],
+                        'sans': ['"Montserrat"', 'sans-serif'],
+                        'arabic': ['"Amiri"', 'serif'], // Font Naskhi
+                    },
+                    backgroundImage: {
+                        'paper-texture': 'url("https://www.transparenttextures.com/patterns/cream-paper.png")',
+                        'batik-pattern': 'url("https://www.transparenttextures.com/patterns/batik-rambutan.png")',
+                        'wood-pattern': 'url("https://www.transparenttextures.com/patterns/wood-pattern.png")',
+                    },
+                    animation: {
+                        'sway': 'sway 3s ease-in-out infinite',
+                        'spin-slow': 'spin 15s linear infinite',
+                    },
+                    keyframes: {
+                        sway: {
+                            '0%, 100%': { transform: 'rotate(-5deg)' },
+                            '50%': { transform: 'rotate(5deg)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* --- GLOBAL & RESET --- */
+        html, body {
+            overflow-x: hidden;
+            background-color: #FDFBF7;
+            color: #5D4037;
+        }
+
+        body.modal-open { overflow: hidden; height: 100vh; position: fixed; width: 100%; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #FDFBF7; }
+        ::-webkit-scrollbar-thumb { background: #A0522D; border-radius: 10px; }
+
+        /* --- DECORATIONS --- */
+        .overlay-batik {
+            position: absolute; inset: 0;
+            background-image: url("https://www.transparenttextures.com/patterns/batik-rambutan.png");
+            opacity: 0.08; pointer-events: none; z-index: 0;
+        }
+        
+        /* Gebyok/Door Animation */
+        .gebyok-panel {
+            transition: transform 1.5s cubic-bezier(0.77, 0, 0.175, 1);
+            background-color: #3E2723;
+            position: relative;
+        }
+        .gebyok-panel::before {
+            content: ''; position: absolute; inset: 0;
+            background-image: url("https://www.transparenttextures.com/patterns/wood-pattern.png");
+            opacity: 0.5; mix-blend-mode: overlay;
+        }
+        .gebyok-panel::after {
+            content: ''; position: absolute; inset: 10px;
+            border: 2px solid #C5A059;
+            background-image: url("https://www.transparenttextures.com/patterns/batik-rambutan.png");
+            opacity: 0.1;
+        }
+
+        .is-open .gebyok-left { transform: translateX(-105%); }
+        .is-open .gebyok-right { transform: translateX(105%); }
+
+        /* Photo Frame */
+        .batik-frame {
+            position: relative;
+            padding: 10px;
+            background-color: #FDFBF7;
+            border: 1px solid #C5A059;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .batik-frame::before {
+            content: ''; position: absolute; inset: 4px;
+            border: 1px dashed #5D4037;
+        }
+
+        /* Falling Flower Petals */
+        .petal {
+            position: fixed; top: -10vh; z-index: 9999;
+            background: #E6DCC5; opacity: 0.8;
+            border-radius: 100% 0 100% 0;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(720deg); }
+        }
+
+        /* Card Chip Effect */
+        .card-chip {
+            width: 30px; height: 20px;
+            background: linear-gradient(135deg, #d4af37 0%, #f9f295 50%, #e0aa3e 100%);
+            border-radius: 4px;
+            position: relative;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+        .card-chip::before {
+            content: ''; position: absolute; inset: 0;
+            background: repeating-linear-gradient(90deg, transparent 0, transparent 2px, rgba(0,0,0,0.2) 2px, rgba(0,0,0,0.2) 3px);
+            border-radius: 4px;
+        }
+
+    </style>
+</head>
+<body class="modal-open antialiased">
+
+    <!-- WATERMARK (Updated Link) -->
+    <a href="https://wa.me/6285161141114?text=halo%20saya%20mau%20pesan%20undangannya" target="_blank" class="fixed bottom-4 right-4 z-[999] opacity-70 hover:opacity-100 transition-opacity cursor-pointer group">
+        <span class="font-sans text-[10px] text-batik-dark tracking-widest border-b border-batik-dark/30 group-hover:border-batik-dark">@malikfaza</span>
+    </a>
+
+    <!-- AUDIO -->
+    <audio id="bg-music" loop preload="auto">
+        <source src="https://files.catbox.moe/1skpmc.mp3" type="audio/mp3">
+    </audio>
+
+    <!-- PETALS CONTAINER -->
+    <div id="petals-container" class="pointer-events-none fixed inset-0 z-0 overflow-hidden"></div>
+
+    <!-- === OPENING GATES (GEBYOK) === -->
+    <div id="opening-overlay" class="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden">
+        
+        <!-- Left Door -->
+        <div class="gebyok-panel gebyok-left absolute top-0 left-0 w-1/2 h-full z-20 flex items-center justify-end border-r-2 border-batik-accent shadow-2xl">
+             <div class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-24 bg-batik-accent rounded-full shadow-lg opacity-80"></div>
+        </div>
+        
+        <!-- Right Door -->
+        <div class="gebyok-panel gebyok-right absolute top-0 right-0 w-1/2 h-full z-20 flex items-center justify-start border-l-2 border-batik-accent shadow-2xl">
+            <div class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-24 bg-batik-accent rounded-full shadow-lg opacity-80"></div>
+        </div>
+
+        <!-- Content Overlay -->
+        <div id="opening-content" class="relative z-30 flex flex-col items-center justify-center text-center p-8 transition-all duration-700 w-full max-w-md bg-cream-50/90 backdrop-blur-sm rounded-xl border border-batik-accent/30 py-12 mx-4 shadow-xl">
+            <svg class="w-20 h-20 mb-6 text-batik-dark opacity-80" viewBox="0 0 100 100" fill="currentColor">
+                <path d="M50 5 C30 30, 10 70, 10 95 H90 C90 70, 70 30, 50 5 Z M50 20 C60 40, 70 60, 50 80 C30 60, 40 40, 50 20 Z" />
+            </svg>
+
+            <h2 class="font-sans text-xs text-batik-DEFAULT tracking-[0.3em] uppercase mb-4">The Wedding of</h2>
+            <h1 class="font-script text-5xl md:text-6xl text-batik-dark mb-8 leading-tight">Malik <br> & <br> Annisa</h1>
+            
+            <button onclick="openInvitation()" class="group relative px-8 py-3 bg-batik-dark text-cream-50 font-serif tracking-widest uppercase text-sm hover:bg-batik-DEFAULT transition-all duration-300 shadow-lg rounded-sm cursor-pointer">
+                Buka Undangan
+            </button>
+        </div>
+    </div>
+
+    <!-- === MAIN CONTENT === -->
+    <main id="main-content" class="relative w-full opacity-0 transition-opacity duration-[2000ms] bg-paper-texture">
+        
+        <!-- Music Control -->
+        <div class="fixed top-5 right-5 z-[60]">
+             <button onclick="toggleMusic()" class="w-10 h-10 rounded-full border border-batik-dark/20 bg-cream-50/80 backdrop-blur flex items-center justify-center text-batik-dark shadow-lg hover:bg-batik-dark hover:text-white transition-all duration-300">
+                <svg id="icon-music" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin-slow"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+            </button>
+        </div>
+
+        <!-- HERO SECTION -->
+        <section class="min-h-screen flex flex-col items-center justify-center relative px-6 py-20 overflow-hidden">
+            <!-- Decorative Corners -->
+            <div class="absolute top-0 left-0 w-32 h-32 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/batik-rambutan.png')] [mask-image:linear-gradient(135deg,black,transparent)]"></div>
+            <div class="absolute top-0 right-0 w-32 h-32 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/batik-rambutan.png')] [mask-image:linear-gradient(-135deg,black,transparent)]"></div>
+            <div class="absolute bottom-0 left-0 w-32 h-32 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/batik-rambutan.png')] [mask-image:linear-gradient(45deg,black,transparent)]"></div>
+            <div class="absolute bottom-0 right-0 w-32 h-32 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/batik-rambutan.png')] [mask-image:linear-gradient(-45deg,black,transparent)]"></div>
+
+            <div class="relative z-10 text-center max-w-lg mx-auto border-y border-batik-accent/30 py-12" id="hero-content">
+                <div data-aos="fade-down" data-aos-duration="1500">
+                    <p class="font-sans text-batik-DEFAULT tracking-[0.2em] text-xs uppercase mb-6">We Invite You to Celebrate</p>
+                </div>
+                
+                <h1 class="font-script text-6xl md:text-8xl text-batik-dark leading-none drop-shadow-sm mb-4" data-aos="zoom-in" data-aos-duration="2000">
+                    Malik
+                    <span class="block text-4xl text-batik-accent my-2 font-serif italic">&</span>
+                    Annisa
+                </h1>
+
+                <div class="mt-8 space-y-2" data-aos="fade-up" data-aos-delay="500">
+                    <p class="font-serif text-xl text-batik-dark font-semibold italic">Selasa, 10 Maret 2026</p>
+                    <div class="flex items-center justify-center gap-2 opacity-60 my-4">
+                        <span class="h-px w-8 bg-batik-dark"></span>
+                        <span class="text-batik-dark text-xs">●</span>
+                        <span class="h-px w-8 bg-batik-dark"></span>
+                    </div>
+                    <p class="font-sans text-xs text-batik-DEFAULT tracking-widest uppercase">Majalengka, Jawa Barat</p>
+                </div>
+
+                <!-- Countdown with Seconds -->
+                <div id="countdown" class="flex flex-wrap justify-center gap-4 md:gap-8 mt-12 text-batik-dark" data-aos="fade-up" data-aos-delay="800">
+                    <!-- JS Injected -->
+                </div>
+            </div>
+
+            <div class="absolute bottom-10 animate-bounce text-batik-dark opacity-50">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+            </div>
+        </section>
+
+        <!-- QUOTE & COUPLE -->
+        <section class="py-24 px-4 relative bg-cream-100">
+            <div class="overlay-batik"></div>
+            
+            <div class="max-w-4xl mx-auto relative z-10">
+                <div class="text-center mb-20 px-4" data-aos="fade-up">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/2/27/Basmala.svg" alt="Bismillah" class="h-12 mx-auto mb-6 opacity-70 filter sepia">
+                    
+                    <!-- Updated Naskhi Font -->
+                    <p class="font-arabic text-3xl text-batik-dark leading-[2] mb-6" dir="rtl">
+                        وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً
+                    </p>
+                    <p class="font-serif text-batik-DEFAULT italic text-md leading-relaxed max-w-2xl mx-auto">
+                        "Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya..."
+                    </p>
+                    <p class="mt-4 text-xs font-sans font-bold text-batik-dark tracking-widest">QS. AR-RUM: 21</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    <!-- Groom -->
+                    <div class="flex flex-col items-center" data-aos="fade-right">
+                        <div class="relative w-56 h-56 mb-6">
+                            <div class="absolute inset-0 rounded-full border border-dashed border-batik-dark animate-spin-slow"></div>
+                            <div class="absolute inset-2 rounded-full overflow-hidden border-4 border-cream-50 shadow-lg">
+                                <img src="https://img.freepik.com/premium-vector/premium-highquality-cartoon-design-part-11_768745-426.jpg?semt=ais_hybrid&w=740&q=80" class="w-full h-full object-cover" alt="Groom">
+                            </div>
+                        </div>
+                        <h3 class="font-script text-4xl text-batik-dark">Malik Faza</h3>
+                        <p class="font-sans text-[10px] text-batik-DEFAULT uppercase tracking-widest mt-1 mb-2">Putra Bpk. Umar & Ibu Nunung</p>
+                    </div>
+
+                    <!-- Bride -->
+                    <div class="flex flex-col items-center" data-aos="fade-left">
+                         <div class="relative w-56 h-56 mb-6">
+                            <div class="absolute inset-0 rounded-full border border-dashed border-batik-dark animate-spin-slow" style="animation-direction: reverse;"></div>
+                            <div class="absolute inset-2 rounded-full overflow-hidden border-4 border-cream-50 shadow-lg">
+                                <img src="https://img.freepik.com/premium-vector/chibi-cute-kawaii-character-cartoon-illustration-teacher-muslim-hijab-girl-holding-book_161819-762.jpg?w=360" class="w-full h-full object-cover" alt="Bride">
+                            </div>
+                        </div>
+                        <h3 class="font-script text-4xl text-batik-dark">Annisa Sholiha</h3>
+                        <p class="font-sans text-[10px] text-batik-DEFAULT uppercase tracking-widest mt-1 mb-2">Putri Bpk. Husain & Ibu Saadah</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- EVENTS -->
+        <section class="py-20 relative overflow-hidden">
+            <div class="max-w-4xl mx-auto px-6 relative z-10">
+                <div class="text-center mb-16" data-aos="fade-up">
+                    <h2 class="font-serif text-4xl text-batik-dark italic">Rangkaian Acara</h2>
+                    <div class="w-24 h-1 bg-batik-accent mx-auto mt-4 rounded-full"></div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Akad Card -->
+                    <div class="bg-cream-50 p-8 rounded-lg border border-batik-accent/20 shadow-[0_5px_15px_-5px_rgba(93,64,55,0.1)] hover:shadow-lg transition-shadow text-center relative overflow-hidden group" data-aos="fade-up">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-batik-dark"></div>
+                         <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-batik-accent/5 rounded-full blur-2xl transition-transform group-hover:scale-150"></div>
+                        
+                        <h3 class="font-script text-3xl text-batik-dark mb-2">Akad Nikah</h3>
+                        <div class="flex justify-center items-center gap-2 mb-6 text-batik-DEFAULT">
+                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                             <span class="font-sans text-sm font-semibold">08:00 WIB - Selesai</span>
+                        </div>
+                        
+                        <div class="border-t border-dashed border-batik-dark/20 py-6">
+                            <p class="font-serif text-lg text-batik-dark mb-1">Selasa, 10 Maret 2026</p>
+                            <p class="font-sans text-xs text-batik-DEFAULT leading-relaxed px-4">
+                                Kediaman Mempelai Wanita<br>
+                                Ds. Kertasari, Kec. Kertajati, Majalengka
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Resepsi Card -->
+                    <div class="bg-cream-50 p-8 rounded-lg border border-batik-accent/20 shadow-[0_5px_15px_-5px_rgba(93,64,55,0.1)] hover:shadow-lg transition-shadow text-center relative overflow-hidden group" data-aos="fade-up" data-aos-delay="100">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-batik-dark"></div>
+                         <div class="absolute -left-10 -top-10 w-40 h-40 bg-batik-accent/5 rounded-full blur-2xl transition-transform group-hover:scale-150"></div>
+
+                        <h3 class="font-script text-3xl text-batik-dark mb-2">Resepsi</h3>
+                         <div class="flex justify-center items-center gap-2 mb-6 text-batik-DEFAULT">
+                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                             <span class="font-sans text-sm font-semibold">11:00 WIB - Selesai</span>
+                        </div>
+
+                        <div class="border-t border-dashed border-batik-dark/20 py-6">
+                            <p class="font-serif text-lg text-batik-dark mb-1">Selasa, 10 Maret 2026</p>
+                            <p class="font-sans text-xs text-batik-DEFAULT leading-relaxed px-4">
+                                Kediaman Mempelai Wanita<br>
+                                Ds. Kertasari, Kec. Kertajati, Majalengka
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12 text-center" data-aos="zoom-in">
+                    <a href="https://www.google.com/maps/search/?api=1&query=Desa+Kertasari+Kecamatan+Kertajati+Majalengka" target="_blank" class="inline-flex items-center gap-3 px-8 py-3 bg-batik-dark text-cream-50 font-serif text-sm tracking-widest hover:bg-batik-DEFAULT transition-all duration-300 rounded-sm shadow-md">
+                        <span>Buka Peta Lokasi</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- GALLERY -->
+        <section class="py-24 relative bg-cream-100">
+            <div class="overlay-batik"></div>
+             <div class="max-w-5xl mx-auto px-4 relative z-10">
+                <div class="text-center mb-12">
+                     <span class="font-script text-3xl text-batik-DEFAULT">Moments</span>
+                     <h2 class="font-serif text-4xl text-batik-dark mt-2">Our Gallery</h2>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="batik-frame transform rotate-1 hover:rotate-0 transition-transform duration-500" data-aos="fade-up">
+                        <img src="https://img.freepik.com/premium-photo/chibi-cartoon-muslim-wedding-couple-ai-generated-image_316488-7875.jpg" class="w-full h-48 md:h-64 object-cover filter sepia-[0.3] hover:sepia-0 transition-all duration-500" alt="Gallery 1">
+                    </div>
+                    <div class="batik-frame transform -rotate-1 hover:rotate-0 transition-transform duration-500" data-aos="fade-up" data-aos-delay="100">
+                         <img src="https://img.freepik.com/premium-vector/premium-highquality-cartoon-design-part-11_768745-426.jpg?semt=ais_hybrid&w=740&q=80" class="w-full h-48 md:h-64 object-cover filter sepia-[0.3] hover:sepia-0 transition-all duration-500" alt="Gallery 2">
+                    </div>
+                     <div class="batik-frame transform rotate-2 hover:rotate-0 transition-transform duration-500 hidden md:block" data-aos="fade-up" data-aos-delay="200">
+                         <img src="https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?q=80&w=1000" class="w-full h-48 md:h-64 object-cover filter sepia-[0.3] hover:sepia-0 transition-all duration-500" alt="Gallery 3">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GIFT & RSVP (Updated Elegant Cards) -->
+        <section class="py-24 px-4 bg-batik-dark relative text-cream-100">
+             <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] opacity-20"></div>
+             
+            <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-16 relative z-10">
+                
+                <!-- Gift Section -->
+                <div data-aos="fade-right">
+                    <h2 class="font-script text-4xl text-batik-accent mb-6">Wedding Gift</h2>
+                    <p class="font-serif text-cream-200 mb-8 text-sm leading-relaxed opacity-80">
+                        Doa restu Anda merupakan karunia yang sangat berarti bagi kami. Namun jika memberi adalah ungkapan tanda kasih Anda, kami menerima kado secara cashless.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <!-- Elegant DANA Card -->
+                        <div class="relative bg-gradient-to-br from-blue-50/10 to-cream-50/10 backdrop-blur-md border border-blue-200/30 p-6 rounded-xl shadow-lg group overflow-hidden">
+                             <div class="absolute top-0 right-0 w-32 h-32 bg-blue-400/10 rounded-full blur-2xl pointer-events-none"></div>
+                             
+                             <div class="flex justify-between items-center mb-6">
+                                 <div class="flex flex-col">
+                                     <div class="card-chip"></div>
+                                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Logo_dana_blue.svg/1200px-Logo_dana_blue.svg.png" class="h-6 filter brightness-0 invert opacity-90" alt="DANA">
+                                 </div>
+                                 <span class="font-serif italic text-xs opacity-60">Digital Wallet</span>
+                            </div>
+                            
+                            <p class="font-mono text-xl tracking-widest mb-4 drop-shadow-md">0851 6114 1114</p>
+                            
+                            <div class="flex justify-between items-end border-t border-cream-100/10 pt-4">
+                                <p class="font-sans text-xs uppercase tracking-widest opacity-80">a.n Malik Faza</p>
+                                <button onclick="copyToClipboard('085161141114', 'DANA')" class="text-blue-100 hover:text-white transition-colors text-xs font-bold flex items-center gap-1 cursor-pointer bg-blue-500/20 px-3 py-1 rounded-full border border-blue-500/30 hover:bg-blue-500/40">
+                                    <span>SALIN</span>
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                         <!-- Elegant SeaBank Card -->
+                         <div class="relative bg-gradient-to-br from-orange-50/10 to-cream-50/10 backdrop-blur-md border border-orange-200/30 p-6 rounded-xl shadow-lg group overflow-hidden">
+                             <div class="absolute top-0 right-0 w-32 h-32 bg-orange-400/10 rounded-full blur-2xl pointer-events-none"></div>
+                             
+                             <div class="flex justify-between items-center mb-6">
+                                 <div class="flex flex-col">
+                                     <div class="card-chip"></div>
+                                     <span class="font-bold italic text-white text-lg tracking-tight">SeaBank</span>
+                                 </div>
+                                 <span class="font-serif italic text-xs opacity-60">Digital Bank</span>
+                            </div>
+                            
+                            <p class="font-mono text-xl tracking-widest mb-4 drop-shadow-md">9016 4283 9446</p>
+                            
+                            <div class="flex justify-between items-end border-t border-cream-100/10 pt-4">
+                                <p class="font-sans text-xs uppercase tracking-widest opacity-80">a.n Annisa Sholiha</p>
+                                <button onclick="copyToClipboard('901642839446', 'SeaBank')" class="text-orange-100 hover:text-white transition-colors text-xs font-bold flex items-center gap-1 cursor-pointer bg-orange-500/20 px-3 py-1 rounded-full border border-orange-500/30 hover:bg-orange-500/40">
+                                    <span>SALIN</span>
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RSVP Form -->
+                <div class="bg-cream-50/5 border border-cream-50/20 p-8 rounded-sm backdrop-blur-sm" data-aos="fade-left">
+                    <h2 class="font-script text-3xl text-batik-accent mb-6">RSVP</h2>
+
+                    <form onsubmit="sendToWhatsApp(event)" class="space-y-5">
+                        <div class="relative">
+                            <input type="text" id="name" class="w-full bg-transparent border-b border-cream-200/30 py-2 text-cream-50 focus:outline-none focus:border-batik-accent transition-colors placeholder-cream-200/50 text-sm" placeholder="Nama Lengkap" required>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="relative">
+                                <select id="status" class="w-full bg-batik-dark/50 border border-cream-200/30 rounded-sm px-3 py-2 text-cream-50 focus:border-batik-accent outline-none text-sm appearance-none">
+                                    <option value="Hadir">Hadir</option>
+                                    <option value="Tidak Hadir">Tidak Hadir</option>
+                                    <option value="Ragu">Masih Ragu</option>
+                                </select>
+                            </div>
+                            <div class="relative">
+                                <select id="pax" class="w-full bg-batik-dark/50 border border-cream-200/30 rounded-sm px-3 py-2 text-cream-50 focus:border-batik-accent outline-none text-sm appearance-none">
+                                    <option value="1">1 Orang</option>
+                                    <option value="2">2 Orang</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="relative">
+                            <textarea id="message" rows="3" class="w-full bg-transparent border-b border-cream-200/30 py-2 text-cream-50 focus:outline-none focus:border-batik-accent transition-colors placeholder-cream-200/50 text-sm" placeholder="Ucapan & Doa" required></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 bg-batik-accent text-batik-dark font-bold font-sans text-xs uppercase tracking-[0.2em] hover:bg-cream-50 transition-all duration-300 shadow-lg cursor-pointer mt-4">
+                            Kirim Pesan
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="bg-[#2D1F1A] pt-12 pb-8 text-center border-t border-batik-dark relative text-cream-200/60">
+            <h2 class="font-script text-3xl text-batik-accent mb-2">Malik & Annisa</h2>
+            <p class="font-serif italic text-xs mb-8">Terima kasih atas doa dan restu Anda.</p>
+            
+            <a href="#" class="text-[9px] uppercase tracking-widest hover:text-batik-accent transition-colors">
+                Javanese Batik Heritage Edition
+            </a>
+        </footer>
+
+    </main>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        // --- PETALS ANIMATION ---
+        function createPetals() {
+            const container = document.getElementById('petals-container');
+            const count = 15;
+
+            for (let i = 0; i < count; i++) {
+                const petal = document.createElement('div');
+                petal.classList.add('petal');
+                const size = Math.random() * 10 + 10 + 'px';
+                petal.style.width = size;
+                petal.style.height = size;
+                petal.style.left = Math.random() * 100 + 'vw';
+                petal.style.animationDuration = Math.random() * 5 + 10 + 's';
+                petal.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(petal);
+            }
+        }
+
+        // --- OPENING ---
+        function openInvitation() {
+            const overlay = document.getElementById('opening-overlay');
+            const content = document.getElementById('opening-content');
+            const main = document.getElementById('main-content');
+            const audio = document.getElementById('bg-music');
+
+            if(audio) {
+                audio.volume = 0.4;
+                audio.play().catch(e => console.log("Audio autoplay prevented"));
+            }
+
+            content.style.opacity = '0';
+            content.style.transform = 'scale(0.9)';
+            
+            setTimeout(() => {
+                overlay.classList.add('is-open');
+            }, 500);
+
+            setTimeout(() => {
+                main.classList.remove('opacity-0');
+                document.body.classList.remove('modal-open');
+                
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 2000); 
+
+                AOS.init({
+                    duration: 1200,
+                    once: true,
+                    offset: 80,
+                }); 
+            }, 1000);
+        }
+
+        // --- MUSIC ---
+        function toggleMusic() {
+            const audio = document.getElementById('bg-music');
+            const icon = document.getElementById('icon-music');
+            if(audio.paused) {
+                audio.play();
+                icon.classList.add('animate-spin-slow');
+                icon.style.opacity = '1';
+            } else {
+                audio.pause();
+                icon.classList.remove('animate-spin-slow');
+                icon.style.opacity = '0.5';
+            }
+        }
+
+        // --- COUNTDOWN (Added Seconds) ---
+        function initCountdown() {
+            const target = new Date("2026-03-10T08:00:00+07:00").getTime();
+            const el = document.getElementById('countdown');
+            
+            setInterval(() => {
+                const now = new Date().getTime();
+                const diff = target - now;
+
+                if (diff < 0) {
+                    el.innerHTML = "<span class='text-batik-dark font-serif italic'>Alhamdulillah, Acara Telah Dimulai</span>";
+                    return;
+                }
+
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+                const boxClass = "text-center min-w-[60px]";
+                const numClass = "text-3xl font-serif text-batik-dark";
+                const labelClass = "text-[10px] uppercase tracking-widest text-batik-DEFAULT";
+                const divider = '<div class="text-2xl text-batik-accent font-serif pt-1">:</div>';
+                
+                el.innerHTML = `
+                    <div class="${boxClass}">
+                        <span class="${numClass}">${d}</span><br>
+                        <span class="${labelClass}">Hari</span>
+                    </div>
+                    ${divider}
+                    <div class="${boxClass}">
+                        <span class="${numClass}">${h}</span><br>
+                        <span class="${labelClass}">Jam</span>
+                    </div>
+                    ${divider}
+                    <div class="${boxClass}">
+                        <span class="${numClass}">${m}</span><br>
+                        <span class="${labelClass}">Menit</span>
+                    </div>
+                    ${divider}
+                    <div class="${boxClass}">
+                        <span class="${numClass}">${s}</span><br>
+                        <span class="${labelClass}">Detik</span>
+                    </div>
+                `;
+            }, 1000);
+        }
+
+        // --- WHATSAPP ---
+        function sendToWhatsApp(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const status = document.getElementById('status').value;
+            const pax = document.getElementById('pax').value;
+            const msg = document.getElementById('message').value;
+
+            const phone = "6285161141114";
+            const text = `*Konfirmasi Kehadiran (Batik Theme)*%0A%0ANama: ${name}%0AStatus: ${status}%0AJumlah: ${pax} Orang%0A%0A"${msg}"%0A%0ATerima Kasih.`;
+            
+            window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
+        }
+
+        // --- CLIPBOARD (Robust Fallback) ---
+        function copyToClipboard(text, label) {
+            // Create textarea dynamically
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            
+            // Ensure it's not visible but part of DOM
+            textArea.style.position = "fixed";
+            textArea.style.left = "0";
+            textArea.style.top = "0";
+            textArea.style.opacity = "0";
+            textArea.style.pointerEvents = "none";
+            
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Tersalin',
+                        text: `Nomor Rekening ${label} berhasil disalin`,
+                        background: '#FDFBF7',
+                        color: '#5D4037',
+                        confirmButtonColor: '#A0522D',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                } else {
+                    throw new Error('Copy command failed');
+                }
+            } catch (err) {
+                console.error('Fallback copy failed', err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Salin',
+                    text: 'Silakan salin manual nomor ini.',
+                    background: '#FDFBF7',
+                    confirmButtonColor: '#A0522D'
+                });
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createPetals();
+            initCountdown();
+        });
+    </script>
+</body>
+</html>
